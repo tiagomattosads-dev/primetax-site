@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import Link from 'next/link';
 import { 
   ChevronRight, 
   ShieldCheck, 
@@ -51,27 +52,58 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden fixed inset-0 bg-white z-50 pt-24 p-6 flex flex-col gap-8 animate-in fade-in slide-in-from-top-4">
-          <a href="#quem-somos" onClick={() => setIsOpen(false)} className="text-navy text-2xl font-bold">Quem Somos</a>
-          <a href="#metodologia" onClick={() => setIsOpen(false)} className="text-navy text-2xl font-bold">Metodologia</a>
-          <a href="#diferenciais" onClick={() => setIsOpen(false)} className="text-navy text-2xl font-bold">Diferenciais</a>
-          <a href="#contato" onClick={() => setIsOpen(false)} className="bg-navy text-white px-6 py-4 rounded-xl text-center font-bold">Fale Conosco</a>
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: '100vh' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="md:hidden fixed inset-0 bg-white z-50 pt-24 p-6 flex flex-col gap-8 overflow-hidden"
+          >
+            {[
+              { href: "#quem-somos", label: "Quem Somos" },
+              { href: "#metodologia", label: "Metodologia" },
+              { href: "#diferenciais", label: "Diferenciais" },
+            ].map((link, i) => (
+              <motion.a 
+                key={link.href}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 + i * 0.1 }}
+                href={link.href} 
+                onClick={() => setIsOpen(false)} 
+                className="text-navy text-2xl font-bold"
+              >
+                {link.label}
+              </motion.a>
+            ))}
+            <motion.a 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              href="#contato" 
+              onClick={() => setIsOpen(false)} 
+              className="bg-navy text-white px-6 py-4 rounded-xl text-center font-bold mt-4"
+            >
+              Fale Conosco
+            </motion.a>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
 
 const Hero = () => (
-  <section id="quem-somos" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-    <div className="container-custom relative z-10 section-padding grid lg:grid-cols-2 gap-20 items-center">
+  <section id="quem-somos" className="relative min-h-screen flex items-center pt-8 md:pt-16 overflow-hidden">
+    <div className="container-custom relative z-10 py-12 px-6 md:py-20 md:px-12 lg:px-24 grid lg:grid-cols-2 gap-20 items-center">
       <motion.div 
         initial={{ opacity: 0, x: -50 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 text-gold font-semibold text-sm mb-6 border border-gold/20">
+        <div className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 text-gold font-semibold text-sm mb-6 border border-gold/20">
           <ShieldCheck size={16} />
           Assessoria Tributária Municipal Especializada
         </div>
@@ -214,6 +246,9 @@ const Methodology = () => {
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) return;
+
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % 4);
     }, 3000);
@@ -252,6 +287,12 @@ const Methodology = () => {
               key={i}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
+              onViewportEnter={() => {
+                if (window.innerWidth < 768) {
+                  setActiveStep(i);
+                }
+              }}
+              viewport={{ amount: 0.6 }}
               animate={{ 
                 scale: activeStep === i ? 1.03 : 1,
                 borderColor: activeStep === i ? "#C5A059" : "#f1f5f9",
@@ -263,9 +304,9 @@ const Methodology = () => {
               <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 transition-all duration-700 shadow-lg ${activeStep === i ? 'bg-gold text-white shadow-gold/20' : 'bg-navy text-white shadow-navy/20'}`}>
                 {item.icon}
               </div>
-              <span className={`font-bold text-sm mb-2 block transition-colors duration-700 ${activeStep === i ? 'text-navy' : 'text-gold'}`}>{item.step}</span>
-              <h4 className="text-lg font-bold text-navy mb-3">{item.title}</h4>
-              <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+              <span className={`font-bold text-sm mb-2 block transition-colors duration-700 ${activeStep === i ? 'text-gold' : 'text-navy'}`}>{item.step}</span>
+              <h4 className={`text-lg font-bold mb-3 transition-colors duration-700 ${activeStep === i ? 'text-gold' : 'text-navy'}`}>{item.title}</h4>
+              <p className={`text-sm leading-relaxed transition-colors duration-700 ${activeStep === i ? 'text-gold-light' : 'text-slate-500'}`}>{item.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -334,23 +375,95 @@ const Results = () => (
   </section>
 );
 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygZCSMBavW-1MwTyXcFvISp2PUa4Moq-UNto9fOh3_mu0TyGtueahux4UZzqTJ5f4a8A/exec';
+
 const Contact = () => {
+  const [isStarted, setIsStarted] = useState(false);
+  const [step, setStep] = useState(0);
+  const [formData, setFormData] = useState({
+    nome: '',
+    municipio: '',
+    email: '',
+    mensagem: ''
+  });
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormState('submitting');
-    setTimeout(() => setFormState('success'), 1500);
+  const steps = [
+    {
+      id: 'nome',
+      question: 'Para começar, qual o seu nome completo?',
+      placeholder: 'Digite seu nome aqui...',
+      type: 'text',
+      field: 'nome'
+    },
+    {
+      id: 'municipio',
+      question: 'Excelente! E qual município você representa?',
+      placeholder: 'Nome do município...',
+      type: 'text',
+      field: 'municipio'
+    },
+    {
+      id: 'email',
+      question: 'Qual o seu melhor e-mail corporativo?',
+      placeholder: 'email@municipio.gov.br',
+      type: 'email',
+      field: 'email'
+    },
+    {
+      id: 'mensagem',
+      question: 'Como a PrimeTax pode ajudar sua gestão hoje?',
+      placeholder: 'Descreva brevemente sua necessidade...',
+      type: 'textarea',
+      field: 'mensagem'
+    }
+  ];
+
+  const handleNext = () => {
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else {
+      handleSubmit();
+    }
   };
+
+  const handlePrev = () => {
+    if (step > 0) setStep(step - 1);
+  };
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setFormState('submitting');
+    
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      setFormState('success');
+      setFormData({ nome: '', municipio: '', email: '', mensagem: '' });
+    } catch (error) {
+      console.error('Erro ao enviar formulário:', error);
+      setFormState('idle');
+      alert('Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente.');
+    }
+  };
+
+  const progress = isStarted ? ((step + 1) / steps.length) * 100 : 0;
 
   return (
     <section id="contato" className="section-padding bg-slate-50 relative overflow-hidden min-h-screen flex items-center">
-      <div className="container-custom grid lg:grid-cols-2 gap-16 relative z-10 w-full">
-        <div>
+      <div className="container-custom grid lg:grid-cols-2 gap-8 lg:gap-16 relative z-10 w-full">
+        <div className="flex flex-col justify-center">
           <h2 className="text-gold font-bold uppercase tracking-widest text-sm mb-4">Fale Conosco</h2>
-          <h3 className="text-4xl font-bold text-navy mb-8">Pronto para transformar a arrecadação do seu município?</h3>
+          <h3 className="text-3xl lg:text-4xl font-bold text-navy mb-4 lg:mb-8 leading-tight">Pronto para transformar a arrecadação do seu município?</h3>
           
-          <div className="space-y-6">
+          <div className="hidden lg:block space-y-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-navy">
                 <Phone size={20} />
@@ -369,59 +482,150 @@ const Contact = () => {
                 <p className="text-navy font-bold">contato@primetaxassessoria.com.br</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-navy">
-                <MapPin size={20} />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 uppercase font-bold">Localização</p>
-                <p className="text-navy font-bold">Rio de Janeiro, RJ</p>
-              </div>
-            </div>
           </div>
         </div>
 
-        <div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-slate-100">
+        <div className="bg-white p-6 md:p-12 rounded-[1.5rem] md:rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-100 relative min-h-[400px] md:min-h-[550px] flex flex-col overflow-hidden">
           {formState === 'success' ? (
-            <div className="text-center py-12">
-              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 size={40} />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center my-auto"
+            >
+              <div className="w-24 h-24 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8">
+                <CheckCircle2 size={48} />
               </div>
-              <h4 className="text-2xl font-bold text-navy mb-2">Mensagem Enviada!</h4>
-              <p className="text-slate-500">Em breve um de nossos especialistas entrará em contato.</p>
+              <h4 className="text-3xl font-bold text-navy mb-4">Mensagem Enviada!</h4>
+              <p className="text-slate-500 text-lg max-w-xs mx-auto">Em breve um de nossos especialistas entrará em contato com você.</p>
               <button 
-                onClick={() => setFormState('idle')}
-                className="mt-8 text-navy font-bold underline"
+                onClick={() => {
+                  setFormState('idle');
+                  setStep(0);
+                  setIsStarted(false);
+                  setFormData({ nome: '', municipio: '', email: '', mensagem: '' });
+                }}
+                className="mt-12 bg-navy text-white px-8 py-4 rounded-xl font-bold hover:bg-navy/90 transition-all flex items-center gap-2 mx-auto"
               >
-                Enviar outra mensagem
+                Enviar outra mensagem <ArrowRight size={18} />
               </button>
-            </div>
+            </motion.div>
+          ) : !isStarted ? (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col h-full justify-center text-center md:text-left"
+            >
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gold/10 text-gold rounded-xl md:rounded-2xl flex items-center justify-center mb-6 md:mb-8 mx-auto md:mx-0">
+                <Mail size={28} />
+              </div>
+              <h4 className="text-2xl md:text-4xl font-bold text-navy mb-4 md:mb-6 leading-tight">
+                Vamos iniciar sua jornada de <span className="text-gold">otimização fiscal</span>.
+              </h4>
+              <p className="text-slate-500 text-base md:text-lg mb-8 md:mb-10 leading-relaxed">
+                Leva menos de 1 minuto para nos contar como podemos ajudar seu município a crescer de forma sustentável.
+              </p>
+              <button 
+                onClick={() => setIsStarted(true)}
+                className="bg-navy text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-navy/90 transition-all shadow-2xl shadow-navy/30 flex items-center justify-center md:justify-start gap-3 w-full md:w-fit group"
+              >
+                Começar
+                <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+              <p className="mt-6 text-slate-400 text-sm font-medium">
+                Preencha o formulário de contato clicando no botão <span className="text-navy font-bold">&quot;Começar&quot;</span>
+              </p>
+            </motion.div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-navy">Nome Completo</label>
-                  <input required type="text" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all" placeholder="Seu nome" />
+            <form onSubmit={handleSubmit} className="flex flex-col h-full">
+              {/* Progress Bar - Integrated into the top edge */}
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-100/50 overflow-hidden">
+                <motion.div 
+                  className="h-full bg-gold"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ type: "spring", stiffness: 50, damping: 15 }}
+                />
+              </div>
+
+              <div className="mb-8 md:mb-12 flex justify-between items-center pt-2 md:pt-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-navy text-white flex items-center justify-center text-[10px] md:text-xs font-bold">
+                    {step + 1}
+                  </span>
+                  <span className="text-navy font-bold text-xs md:text-sm tracking-widest uppercase">Passo {step + 1} de {steps.length}</span>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-navy">Município</label>
-                  <input required type="text" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all" placeholder="Nome do município" />
-                </div>
+                {step > 0 && (
+                  <button type="button" onClick={handlePrev} className="text-slate-400 hover:text-navy transition-colors flex items-center gap-1 text-sm font-bold group">
+                    <ChevronRight size={16} className="rotate-180 group-hover:-translate-x-1 transition-transform" />
+                    Voltar
+                  </button>
+                )}
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-navy">E-mail Corporativo</label>
-                <input required type="email" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all" placeholder="email@municipio.gov.br" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-navy">Mensagem</label>
-                <textarea required rows={4} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all resize-none" placeholder="Como podemos ajudar seu município?"></textarea>
-              </div>
-              <button 
-                disabled={formState === 'submitting'}
-                className="w-full bg-navy text-white py-4 rounded-xl font-bold hover:bg-navy/90 transition-all shadow-lg shadow-navy/20 flex items-center justify-center gap-2"
-              >
-                {formState === 'submitting' ? 'Enviando...' : 'Solicitar Contato Especializado'}
-              </button>
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={step}
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -30 }}
+                  transition={{ duration: 0.4, ease: "circOut" }}
+                  className="flex-grow flex flex-col justify-center"
+                >
+                  <label className="text-2xl md:text-4xl font-bold text-navy mb-6 md:mb-10 block leading-tight">
+                    {steps[step].question}
+                  </label>
+                  
+                  <div className="relative group">
+                    {steps[step].type === 'textarea' ? (
+                      <textarea
+                        autoFocus
+                        rows={3}
+                        className="w-full text-xl md:text-3xl bg-transparent border-b-2 border-slate-100 focus:border-gold outline-none py-3 md:py-4 transition-all resize-none text-navy placeholder:text-slate-200 font-medium"
+                        placeholder={steps[step].placeholder}
+                        value={formData[steps[step].field as keyof typeof formData]}
+                        onChange={(e) => setFormData({ ...formData, [steps[step].field]: e.target.value })}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            if (formData[steps[step].field as keyof typeof formData]) handleNext();
+                          }
+                        }}
+                      />
+                    ) : (
+                      <input
+                        autoFocus
+                        type={steps[step].type}
+                        className="w-full text-xl md:text-3xl bg-transparent border-b-2 border-slate-100 focus:border-gold outline-none py-3 md:py-4 transition-all text-navy placeholder:text-slate-200 font-medium"
+                        placeholder={steps[step].placeholder}
+                        value={formData[steps[step].field as keyof typeof formData]}
+                        onChange={(e) => setFormData({ ...formData, [steps[step].field]: e.target.value })}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            if (formData[steps[step].field as keyof typeof formData]) handleNext();
+                          }
+                        }}
+                      />
+                    )}
+                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-500 group-focus-within:w-full" />
+                  </div>
+
+                  <div className="mt-8 md:mt-16 flex flex-col md:flex-row items-center gap-8">
+                    <button
+                      type={step === steps.length - 1 ? "submit" : "button"}
+                      onClick={step === steps.length - 1 ? undefined : handleNext}
+                      disabled={!formData[steps[step].field as keyof typeof formData] || formState === 'submitting'}
+                      className="bg-navy text-white px-8 py-4 md:px-12 md:py-5 rounded-xl md:rounded-2xl font-bold text-base md:text-lg hover:bg-navy/90 transition-all shadow-2xl shadow-navy/30 flex items-center justify-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed group w-full md:w-fit"
+                    >
+                      {formState === 'submitting' ? 'Enviando...' : step === steps.length - 1 ? 'Finalizar' : 'Continuar'}
+                      <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
+                    <div className="hidden md:flex items-center gap-3 text-slate-400 text-xs font-bold uppercase tracking-widest">
+                      <span>Pressione</span>
+                      <span className="px-2 py-1 bg-slate-100 rounded border border-slate-200 text-navy">ENTER</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </form>
           )}
         </div>
@@ -458,11 +662,10 @@ const Footer = () => (
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-6 text-gold uppercase tracking-widest text-xs">Legal</h4>
+          <h4 className="font-bold mb-6 text-gold uppercase tracking-widest text-xs">Políticas e Termos</h4>
           <ul className="space-y-4 text-slate-400 text-sm">
-            <li><a href="#" className="hover:text-white transition-colors">Privacidade</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Termos de Uso</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Compliance</a></li>
+            <li><Link href="/politica-de-privacidade" className="hover:text-white transition-colors">Privacidade</Link></li>
+            <li><Link href="/termos-de-uso" className="hover:text-white transition-colors">Termos de Uso</Link></li>
           </ul>
         </div>
       </div>
