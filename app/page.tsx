@@ -380,12 +380,10 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygZCSMBavW-1
 const Contact = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState({
-    nome: '',
-    municipio: '',
-    email: '',
-    mensagem: ''
-  });
+  const [nome, setNome] = useState('');
+  const [municipio, setMunicipio] = useState('');
+  const [email, setEmail] = useState('');
+  const [mensagem, setMensagem] = useState('');
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle');
 
   const steps = [
@@ -422,8 +420,6 @@ const Contact = () => {
   const handleNext = () => {
     if (step < steps.length - 1) {
       setStep(step + 1);
-    } else {
-      handleSubmit();
     }
   };
 
@@ -431,22 +427,32 @@ const Contact = () => {
     if (step > 0) setStep(step - 1);
   };
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (step < steps.length - 1) {
+      handleNext();
+      return;
+    }
+
     setFormState('submitting');
     
     try {
+      const data = { nome, municipio, email, mensagem };
       await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
       
       setFormState('success');
-      setFormData({ nome: '', municipio: '', email: '', mensagem: '' });
+      setNome('');
+      setMunicipio('');
+      setEmail('');
+      setMensagem('');
     } catch (error) {
       console.error('Erro ao enviar formulário:', error);
       setFormState('idle');
@@ -502,7 +508,10 @@ const Contact = () => {
                   setFormState('idle');
                   setStep(0);
                   setIsStarted(false);
-                  setFormData({ nome: '', municipio: '', email: '', mensagem: '' });
+                  setNome('');
+                  setMunicipio('');
+                  setEmail('');
+                  setMensagem('');
                 }}
                 className="mt-12 bg-navy text-white px-8 py-4 rounded-xl font-bold hover:bg-navy/90 transition-all flex items-center gap-2 mx-auto"
               >
@@ -576,32 +585,52 @@ const Contact = () => {
                   </label>
                   
                   <div className="relative group">
-                    {steps[step].type === 'textarea' ? (
+                    {step === 0 && (
+                      <input
+                        required
+                        autoFocus
+                        type="text"
+                        className="w-full text-xl md:text-3xl bg-transparent border-b-2 border-slate-100 focus:border-gold outline-none py-3 md:py-4 transition-all text-navy placeholder:text-slate-200 font-medium"
+                        placeholder={steps[0].placeholder}
+                        value={nome}
+                        onChange={(e) => setNome(e.target.value)}
+                      />
+                    )}
+                    {step === 1 && (
+                      <input
+                        required
+                        autoFocus
+                        type="text"
+                        className="w-full text-xl md:text-3xl bg-transparent border-b-2 border-slate-100 focus:border-gold outline-none py-3 md:py-4 transition-all text-navy placeholder:text-slate-200 font-medium"
+                        placeholder={steps[1].placeholder}
+                        value={municipio}
+                        onChange={(e) => setMunicipio(e.target.value)}
+                      />
+                    )}
+                    {step === 2 && (
+                      <input
+                        required
+                        autoFocus
+                        type="email"
+                        className="w-full text-xl md:text-3xl bg-transparent border-b-2 border-slate-100 focus:border-gold outline-none py-3 md:py-4 transition-all text-navy placeholder:text-slate-200 font-medium"
+                        placeholder={steps[2].placeholder}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    )}
+                    {step === 3 && (
                       <textarea
+                        required
                         autoFocus
                         rows={3}
                         className="w-full text-xl md:text-3xl bg-transparent border-b-2 border-slate-100 focus:border-gold outline-none py-3 md:py-4 transition-all resize-none text-navy placeholder:text-slate-200 font-medium"
-                        placeholder={steps[step].placeholder}
-                        value={formData[steps[step].field as keyof typeof formData]}
-                        onChange={(e) => setFormData({ ...formData, [steps[step].field]: e.target.value })}
+                        placeholder={steps[3].placeholder}
+                        value={mensagem}
+                        onChange={(e) => setMensagem(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
-                            if (formData[steps[step].field as keyof typeof formData]) handleNext();
-                          }
-                        }}
-                      />
-                    ) : (
-                      <input
-                        autoFocus
-                        type={steps[step].type}
-                        className="w-full text-xl md:text-3xl bg-transparent border-b-2 border-slate-100 focus:border-gold outline-none py-3 md:py-4 transition-all text-navy placeholder:text-slate-200 font-medium"
-                        placeholder={steps[step].placeholder}
-                        value={formData[steps[step].field as keyof typeof formData]}
-                        onChange={(e) => setFormData({ ...formData, [steps[step].field]: e.target.value })}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            if (formData[steps[step].field as keyof typeof formData]) handleNext();
+                            e.currentTarget.form?.requestSubmit();
                           }
                         }}
                       />
@@ -611,9 +640,8 @@ const Contact = () => {
 
                   <div className="mt-8 md:mt-16 flex flex-col md:flex-row items-center gap-8">
                     <button
-                      type={step === steps.length - 1 ? "submit" : "button"}
-                      onClick={step === steps.length - 1 ? undefined : handleNext}
-                      disabled={!formData[steps[step].field as keyof typeof formData] || formState === 'submitting'}
+                      type="submit"
+                      disabled={formState === 'submitting'}
                       className="bg-navy text-white px-8 py-4 md:px-12 md:py-5 rounded-xl md:rounded-2xl font-bold text-base md:text-lg hover:bg-navy/90 transition-all shadow-2xl shadow-navy/30 flex items-center justify-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed group w-full md:w-fit"
                     >
                       {formState === 'submitting' ? 'Enviando...' : step === steps.length - 1 ? 'Finalizar' : 'Continuar'}
