@@ -29,7 +29,7 @@ const Navbar = () => {
   return (
     <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
       <div className="container-custom flex justify-between items-center h-16 md:h-20 px-6">
-        <div className="relative w-40 h-12">
+        <Link href="/" className="relative w-56 h-20 block">
           <Image 
             src="https://res.cloudinary.com/dyzcc4ex0/image/upload/v1774270680/LOGO_SITE_AZUL_E_DOURADO_vpiirb.webp" 
             alt="PrimeTax Logo" 
@@ -37,10 +37,10 @@ const Navbar = () => {
             className="object-contain"
             referrerPolicy="no-referrer"
           />
-        </div>
+        </Link>
         
         <div className="hidden md:flex gap-8 items-center text-sm font-medium text-navy">
-          <a href="#quem-somos" className="hover:text-gold transition-colors">Quem Somos</a>
+          <a href="#quem-somos" className="hover:text-gold transition-colors">A Primetax</a>
           <a href="#metodologia" className="hover:text-gold transition-colors">Metodologia</a>
           <a href="#diferenciais" className="hover:text-gold transition-colors">Diferenciais</a>
           <a href="#contato" className="bg-navy text-white px-6 py-2.5 rounded-full hover:bg-navy/90 transition-all">Fale Conosco</a>
@@ -62,7 +62,7 @@ const Navbar = () => {
             className="md:hidden fixed inset-0 bg-white z-50 pt-24 p-6 flex flex-col gap-8 overflow-hidden"
           >
             {[
-              { href: "#quem-somos", label: "Quem Somos" },
+              { href: "#quem-somos", label: "A Primetax" },
               { href: "#metodologia", label: "Metodologia" },
               { href: "#diferenciais", label: "Diferenciais" },
             ].map((link, i) => (
@@ -96,7 +96,7 @@ const Navbar = () => {
 };
 
 const Hero = () => (
-  <section id="quem-somos" className="relative min-h-screen flex items-center pt-8 md:pt-16 overflow-hidden">
+  <section id="hero" className="relative min-h-screen flex items-center pt-8 md:pt-16 overflow-hidden">
     <div className="container-custom relative z-10 py-12 px-6 md:py-20 md:px-12 lg:px-24 grid lg:grid-cols-2 gap-20 items-center">
       <motion.div 
         initial={{ opacity: 0, x: -50 }}
@@ -155,6 +155,37 @@ const Hero = () => (
         </div>
         <div className="absolute -top-10 -right-10 w-64 h-64 bg-gold/5 rounded-full blur-3xl -z-10" />
         <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-navy/5 rounded-full blur-3xl -z-10" />
+      </motion.div>
+    </div>
+  </section>
+);
+
+const QuemSomos = () => (
+  <section id="quem-somos" className="py-24 bg-white">
+    <div className="container-custom px-6 md:px-12 lg:px-24">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="max-w-4xl mx-auto"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-navy mb-12 text-center">
+          A Força Estratégica por Trás do Crescimento Arrecadatório Municipal
+        </h2>
+        <div className="space-y-8 text-lg text-slate-600 leading-relaxed">
+          <p>
+            A Primetax surgiu com um propósito fundamental e inegociável: prestar assessoria de excelência especializada em estratégia tributária municipal. Nosso foco diário é garantir o aumento da arrecadação das prefeituras, aliando o máximo de impacto financeiro sustentável à mais rigorosa segurança jurídica.
+          </p>
+          <p>
+            Nós compreendemos que o Índice de Participação dos Municípios (IPM) vai muito além de um simples indicador contábil; ele é uma ferramenta estratégica decisiva para a gestão pública. Como o IPM define o percentual exato de repasse do ICMS, sabemos que variações mínimas afetam diretamente a receita corrente líquida, a capacidade de investimento, o planejamento orçamentário e, em última instância, a sustentabilidade fiscal do seu município.
+          </p>
+          <p>
+            Diferente de consultorias generalistas, nossa atuação é dedicada exclusivamente à otimização do IPM. Contamos com uma equipe técnica de ponta, dotada de profunda expertise tributária municipal. Mergulhamos nos dados da sua cidade para realizar desde a revisão técnica minuciosa e a auditoria do valor adicionado, até a identificação de inconsistências críticas na DECLAN-IPM. Atuamos com firmeza na recuperação administrativa e judicial de todos os valores que pertencem de direito ao município.
+          </p>
+          <blockquote className="border-l-4 border-gold pl-6 py-2 italic font-semibold text-navy">
+            Nosso modelo de trabalho é integralmente orientado a resultados. Pautados pela total transparência e pela entrega de relatórios técnicos fundamentados, garantimos segurança jurídica em cada etapa do processo. Na Primetax, nós não entregamos apenas análises teóricas. Nós entregamos o aumento real da arrecadação, o fortalecimento da autonomia financeira e resultados comprovados para a sua gestão.
+          </blockquote>
+        </div>
       </motion.div>
     </div>
   </section>
@@ -476,7 +507,7 @@ const Contact = () => {
               </div>
               <div>
                 <p className="text-xs text-slate-500 uppercase font-bold">Telefone</p>
-                <p className="text-navy font-bold">(21) 98155-5158</p>
+                <p className="text-navy font-bold">(21) 967248239</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -712,6 +743,7 @@ export default function LandingPage() {
     <main className="font-sans">
       <Navbar />
       <Hero />
+      <QuemSomos />
       <Challenges />
       <StrategicImportance />
       <Methodology />
