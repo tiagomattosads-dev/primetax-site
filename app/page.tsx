@@ -161,7 +161,7 @@ const Hero = () => (
 );
 
 const QuemSomos = () => (
-  <section id="quem-somos" className="py-24 bg-white">
+  <section id="quem-somos" className="min-h-screen bg-white flex items-center py-24">
     <div className="container-custom px-6 md:px-12 lg:px-24">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -169,22 +169,41 @@ const QuemSomos = () => (
         transition={{ duration: 0.8 }}
         className="max-w-4xl mx-auto"
       >
+        <h2 className="text-gold font-bold uppercase tracking-widest text-sm mb-4 text-center">Quem Somos</h2>
         <h2 className="text-3xl md:text-4xl font-bold text-navy mb-12 text-center">
-          A Força Estratégica por Trás do Crescimento Arrecadatório Municipal
+          Especialistas em Estratégia Tributária Municipal
         </h2>
         <div className="space-y-8 text-lg text-slate-600 leading-relaxed">
           <p>
-            A Primetax surgiu com um propósito fundamental e inegociável: prestar assessoria de excelência especializada em estratégia tributária municipal. Nosso foco diário é garantir o aumento da arrecadação das prefeituras, aliando o máximo de impacto financeiro sustentável à mais rigorosa segurança jurídica.
+            A Primetax surgiu com o objetivo de prestar assessoria especializada em estratégia tributária municipal, com atuação focada exclusivamente no Índice de Participação dos Municípios (IPM). Formada por uma equipe técnica com profunda expertise, nossa missão é identificar perdas silenciosas e corrigir distorções fiscais, garantindo que o seu município recupere os repasses aos quais tem direito.
           </p>
           <p>
-            Nós compreendemos que o Índice de Participação dos Municípios (IPM) vai muito além de um simples indicador contábil; ele é uma ferramenta estratégica decisiva para a gestão pública. Como o IPM define o percentual exato de repasse do ICMS, sabemos que variações mínimas afetam diretamente a receita corrente líquida, a capacidade de investimento, o planejamento orçamentário e, em última instância, a sustentabilidade fiscal do seu município.
+            Nosso modelo de trabalho é estritamente orientado a resultado, conduzindo desde o diagnóstico de dados até a recuperação administrativa e judicial de valores. Atuando com total transparência e segurança jurídica em todas as etapas, nós não entregamos apenas análise técnica: entregamos o aumento real da arrecadação e resultados financeiros comprovados para a sua gestão.
           </p>
-          <p>
-            Diferente de consultorias generalistas, nossa atuação é dedicada exclusivamente à otimização do IPM. Contamos com uma equipe técnica de ponta, dotada de profunda expertise tributária municipal. Mergulhamos nos dados da sua cidade para realizar desde a revisão técnica minuciosa e a auditoria do valor adicionado, até a identificação de inconsistências críticas na DECLAN-IPM. Atuamos com firmeza na recuperação administrativa e judicial de todos os valores que pertencem de direito ao município.
-          </p>
-          <blockquote className="border-l-4 border-gold pl-6 py-2 italic font-semibold text-navy">
-            Nosso modelo de trabalho é integralmente orientado a resultados. Pautados pela total transparência e pela entrega de relatórios técnicos fundamentados, garantimos segurança jurídica em cada etapa do processo. Na Primetax, nós não entregamos apenas análises teóricas. Nós entregamos o aumento real da arrecadação, o fortalecimento da autonomia financeira e resultados comprovados para a sua gestão.
-          </blockquote>
+        </div>
+        <div className="mt-12 text-center">
+          <a href="#contato" className="inline-block bg-navy text-white px-8 py-4 rounded-full font-bold hover:bg-navy/90 transition-all shadow-lg shadow-navy/20">
+            FALAR COM UM ESPECIALISTA
+          </a>
+        </div>
+
+        {/* Interactive Values */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+          {[
+            { icon: FileSearch, title: "Excelência Técnica", desc: "Equipe especializada em tributação municipal." },
+            { icon: TrendingUp, title: "Transparência", desc: "Relatórios claros e fundamentados." },
+            { icon: ShieldCheck, title: "Segurança Jurídica", desc: "Atuação pautada pela legislação vigente." },
+          ].map((item, idx) => (
+            <motion.div
+              key={idx}
+              whileHover={{ scale: 1.02 }}
+              className="bg-slate-50 p-8 rounded-3xl border border-slate-100 transition-all cursor-default flex flex-col items-center text-center"
+            >
+              <item.icon className="w-10 h-10 text-gold mb-6" />
+              <h3 className="text-xl font-bold text-navy mb-3">{item.title}</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+            </motion.div>
+          ))}
         </div>
       </motion.div>
     </div>
